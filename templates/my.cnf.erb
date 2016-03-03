@@ -4,10 +4,12 @@
 <%   if v.is_a?(Hash) -%>
 [<%=   k %>]
 <%     v.sort.map do |ki, vi| -%>
-<%       if ki == 'ssl-disable' or (ki =~ /^ssl/ and v['ssl-disable'] == true) -%>
+<%       if v.select {|kii,vii| (['ssl-disable', 'disable-ssl', 'skip-ssl'].include?(kii) and [:true, true, ''].include?(vii)) or (kii == 'ssl' and [:false, false, 0].include?(vii))}.size > 0 and ki =~ /^ssl/ -%>
 <%         next %>
-<%       elsif vi == true or vi == '' -%>
+<%       elsif [:true, true, '', 'on'].include?(vi) -%>
 <%=        ki %>
+<%       elsif [:false, false, 'off'].include?(vi) -%>
+<%         next -%>
 <%       elsif vi.is_a?(Array) -%>
 <%         vi.each do |vii| -%>
 <%=          ki %> = <%= vii %>

@@ -29,32 +29,28 @@ describe 'mysql::server' do
           end
         end
 
-        describe 'skip-name-resolve set to an empty string' do
-          let(:params) {{ :override_options => { 'mysqld' => { 'skip-name-resolve' => '' }}}}
-          it { is_expected.to contain_file('mysql-config-file').with_content(/^skip-name-resolve$/) }
-        end
-
         describe 'ssl set to true' do
           let(:params) {{ :override_options => { 'mysqld' => { 'ssl' => true }}}}
-          it { is_expected.to contain_file('mysql-config-file').with_content(/ssl/) }
+          it { is_expected.to contain_file('mysql-config-file').with_content(/^ssl$/) }
           it { is_expected.to contain_file('mysql-config-file').without_content(/ssl = true/) }
-        end
-
-        describe 'ssl set to false' do
-          let(:params) {{ :override_options => { 'mysqld' => { 'ssl' => false }}}}
-          it { is_expected.to contain_file('mysql-config-file').with_content(/ssl = false/) }
         end
 
         # ssl-disable (and ssl) are special cased within mysql.
         describe 'possibility of disabling ssl completely' do
           let(:params) {{ :override_options => { 'mysqld' => { 'ssl' => true, 'ssl-disable' => true }}}}
-          it { is_expected.to contain_file('mysql-config-file').without_content(/ssl = true/) }
+          it { is_expected.to contain_file('mysql-config-file').without_content(/^ssl.*/) }
         end
 
         describe 'a non ssl option set to true' do
           let(:params) {{ :override_options => { 'mysqld' => { 'test' => true }}}}
           it { is_expected.to contain_file('mysql-config-file').with_content(/^test$/) }
           it { is_expected.to contain_file('mysql-config-file').without_content(/test = true/) }
+        end
+
+        describe 'a non ssl option set to false' do
+          let(:params) {{ :override_options => { 'mysqld' => { 'test' => false }}}}
+          it { is_expected.to contain_file('mysql-config-file').without_content(/^test$/) }
+          it { is_expected.to contain_file('mysql-config-file').without_content(/test = false/) }
         end
 
         context 'with includedir' do
